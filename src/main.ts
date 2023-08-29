@@ -1,24 +1,27 @@
-import './style.css'
-import typescriptLogo from './typescript.svg'
-import viteLogo from '/vite.svg'
-import { setupCounter } from './counter.ts'
+import DomListRender from "./DomListRender";
+import FullList from "./FullList";
+import ListItems from "./ListItem";
 
-document.querySelector<HTMLDivElement>('#app')!.innerHTML = `
-  <div>
-    <a href="https://vitejs.dev" target="_blank">
-      <img src="${viteLogo}" class="logo" alt="Vite logo" />
-    </a>
-    <a href="https://www.typescriptlang.org/" target="_blank">
-      <img src="${typescriptLogo}" class="logo vanilla" alt="TypeScript logo" />
-    </a>
-    <h1>Vite + TypeScript</h1>
-    <div class="card">
-      <button id="counter" type="button"></button>
-    </div>
-    <p class="read-the-docs">
-      Click on the Vite and TypeScript logos to learn more
-    </p>
-  </div>
-`
+const initApp = (): void => {
+  const fulllist = FullList.instance;
+  const domlist = DomListRender.instance;
 
-setupCounter(document.querySelector<HTMLButtonElement>('#counter')!)
+  const form = document.getElementById("addlistform") as HTMLFormElement;
+  form.addEventListener("submit", (event: SubmitEvent) => {
+    event.preventDefault();
+    const input = document.getElementById("item") as HTMLInputElement;
+    const newEntry: string = input.value.trim();
+    if (!newEntry.length) return;
+    const itemId: number = fulllist.items.length
+      ? parseInt(fulllist.items[fulllist.items.length - 1].id) + 1
+      : 1;
+    const item = new ListItems(itemId.toString(), newEntry, false);
+    fulllist.addItem(item);
+    domlist.render(fulllist);
+    console.log(fulllist.items);
+  });
+  fulllist.load();
+  domlist.render(fulllist);
+};
+
+document.addEventListener("DOMContentLoaded", initApp);
